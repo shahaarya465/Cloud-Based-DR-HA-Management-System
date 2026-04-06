@@ -4,6 +4,8 @@ A simple web application that demonstrates disaster recovery workflows and high 
 
 This project helps show how a system can reduce downtime and data loss during failures.
 
+**🚀 Live Demo:** [http://15.206.172.53:5000/auth/login](http://15.206.172.53:5000/auth/login) *(Currently hosted on an AWS EC2 instance)*
+
 ## 1. Project Objective
 
 Build a reliable and scalable DR solution that can:
@@ -14,15 +16,16 @@ Build a reliable and scalable DR solution that can:
 - Minimize downtime (low RTO)
 - Minimize data loss (low RPO)
 
-## 2. Current Status
+## 2. Current Status & AWS Deployment
 
-This version is a working prototype with:
+This version is a fully functional prototype that has been successfully deployed to the cloud.
 
-- Flask backend
-- SQLite database
-- Backup and recovery simulation
-- Dashboard for visibility
-- Modular project structure
+**Current Live Deployment:** The application is currently accessible via a standalone AWS EC2 instance. This "Phase 1" deployment serves to validate the application logic, database models, and backup simulation workflows in a live cloud environment.
+
+**High Availability Test Environment (Architected):** A robust High Availability (HA) test architecture has been designed and provisioned, which includes:
+- **Application Load Balancer (ALB)** to distribute traffic.
+- **Auto Scaling Group (ASG)** configured with a minimum of 2 EC2 instances across multiple Availability Zones.
+- *Note: The live demo is currently running on a single EC2 instance while the backend is being refactored to support distributed, stateless operation (e.g., migrating from local SQLite to RDS) before deploying to the full ASG environment.*
 
 ## 3. Key Features Implemented
 
@@ -51,46 +54,13 @@ Logical DR roles represented in the project:
 ## 5. Tech Stack
 
 - Backend: Python, Flask
-- Database: SQLite
+- Database: SQLite (Transitioning to PostgreSQL/Amazon RDS)
 - ORM: Flask-SQLAlchemy
 - Auth: Flask-Login
 - Frontend: HTML, CSS, JavaScript, Bootstrap
+- Cloud Infrastructure: AWS (EC2, ALB, Auto Scaling Groups)
 
-## 6. Project Structure
-
-```text
-SGP3/
-  app.py
-  config.py
-  extensions.py
-  requirements.txt
-  cloud_dr_portal.db
-  backups/
-    archived/
-  models/
-    user_model.py
-    backup_model.py
-    recovery_model.py
-  routes/
-    auth_routes.py
-    dashboard_routes.py
-    backup_routes.py
-    recovery_routes.py
-  services/
-    backup_service.py
-    recovery_service.py
-  templates/
-    login.html
-    register.html
-    dashboard.html
-    backups.html
-    recovery.html
-  static/
-    css/styles.css
-    js/scripts.js
-```
-
-## 7. Getting Started
+## 6. Getting Started (Local Development)
 
 ### Prerequisites
 
@@ -113,7 +83,7 @@ PowerShell:
 
 CMD:
 
-```bat
+```dos
 .\.venv\Scripts\activate.bat
 ```
 
@@ -125,19 +95,11 @@ pip install -r requirements.txt
 
 ### Run Application
 
-Option 1:
-
 ```bash
 flask --app app.py run --debug
 ```
 
-Option 2:
-
-```bash
-python app.py
-```
-
-## 8. Configuration
+## 7. Configuration
 
 Set environment variables before running in real environments:
 
@@ -155,66 +117,34 @@ $env:ADMIN_DEFAULT_USERNAME="admin"
 $env:ADMIN_DEFAULT_PASSWORD="change-this-password"
 ```
 
-## 9. How to Use
+## 8. How to Use
 
-1. Open the app in browser.
-2. Register a user or log in.
-3. Upload backup files from Backups page.
-4. Archive, restore, or purge backups.
-5. Open Recovery page and run recovery simulation.
-6. View recovery logs and dashboard metrics.
+- Open the app in the browser via the live IP or localhost.
+- Register a user or log in.
+- Upload backup files from the Backups page.
+- Archive, restore, or purge backups.
+- Open the Recovery page and run a recovery simulation.
+- View recovery logs and dashboard metrics.
 
-## 10. Missing Components for Production
+## 9. Recommended Improvement Plan (The Path to True HA)
 
-The current version is a prototype. For industry readiness, add:
+To fully utilize the mocked Auto Scaling Group and Load Balancer test environment, the following transitions are actively planned:
 
-- Real health monitoring endpoints and probes
-- Automated failover with load balancer or DNS failover
-- PostgreSQL with replication and PITR
-- Object storage for backups (S3, Azure Blob, GCS)
-- Alerting (email, Slack, PagerDuty)
-- Centralized logging and observability
-- Role-based access control and audit trails
-- CI/CD pipeline and infrastructure as code
+Phase 1: Decoupling State (In Progress)
 
-## 11. Recommended Improvement Plan
+- Database Migration: Replace the local sqlite:///cloud_dr_portal.db with an Amazon RDS (PostgreSQL/MySQL) instance so multiple EC2s can share the same user data.
+- Shared Storage: Refactor backup_service.py to upload files to an Amazon S3 bucket rather than the local EC2 disk.
 
-### Phase 1 (Now)
+Phase 2: Production Web Server
 
-- Add tests for backup and recovery workflows
-- Add structured logs and request IDs
-- Move secrets to environment management
-- Add migration support (Flask-Migrate)
+- Wrap the Flask application in a production WSGI server (Gunicorn) and set up a reverse proxy (Nginx) to handle incoming HTTP requests securely on port 80.
 
-### Phase 2 (Next)
+Phase 3: The HA Cutover
 
-- Migrate from SQLite to PostgreSQL
-- Move files from local disk to cloud object storage
-- Add async jobs for heavy operations
-- Add metrics, dashboards, and alerts
+- Create an Amazon Machine Image (AMI) of the stateless EC2 configuration.
+- Attach the Load Balancer and execute the Auto Scaling Group deployment to achieve a multi-AZ, fault-tolerant infrastructure.
 
-### Phase 3 (Production)
-
-- Containerize with Docker
-- Deploy with Kubernetes or managed containers
-- Use multi-zone architecture
-- Implement failover and failback runbooks
-- Run periodic disaster recovery drills
-
-## 12. Suggested Cloud Mapping
-
-AWS example:
-
-- App: ECS/Fargate or EKS
-- DB: RDS PostgreSQL Multi-AZ
-- Storage: S3 with versioning and lifecycle
-- Secrets: Secrets Manager
-- Monitoring: CloudWatch + Grafana
-- Traffic: ALB + Route 53 health-based routing
-
-Equivalent services are available in Azure and GCP.
-
-## 13. Security Best Practices
+## 10. Security Best Practices
 
 - Never use default credentials in production
 - Enforce strong authentication and authorization
@@ -222,7 +152,7 @@ Equivalent services are available in Azure and GCP.
 - Keep immutable logs for recovery actions
 - Scan dependencies and container images regularly
 
-## 14. Success Metrics
+## 11. Success Metrics
 
 Track these core metrics:
 
@@ -232,10 +162,7 @@ Track these core metrics:
 - Mean Time To Recover (MTTR)
 - Backup success and restore success rate
 
-## 15. Future Enhancements
+## 12. Team Members
 
-- Real-time notifications and incident response workflows
-- Multi-region active-passive setup
-- Policy-driven backup retention and cleanup
-- Advanced availability dashboards
-- Automated rollback in CI/CD deployments
+- Aarya Shah - [GitHub](https://github.com/shahaarya465)
+- Aditya Patel - [GitHub](https://github.com/adityapatel007-byte)
