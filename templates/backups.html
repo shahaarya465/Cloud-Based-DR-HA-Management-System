@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Secure Vault | FinGuard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+            <aside class="col-md-3 col-lg-2 sidebar p-4">
+                <h5 class="mb-4">FinGuard <br><span class="fs-6 fw-normal text-muted">Financial DR</span></h5>
+                <nav class="nav flex-column gap-2">
+                    <a class="nav-link" href="{{ url_for('dashboard.home') }}">Global Status</a>
+                    <a class="nav-link active" href="{{ url_for('backup.manage_backups') }}">Secure Vault</a>
+                    <a class="nav-link" href="{{ url_for('recovery.recovery_page') }}">Failover Protocol</a>
+                    <div class="mt-4 pt-3 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
+                        <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">Terminate Session</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <main class="col-md-9 col-lg-10 p-5">
+                <h3 class="mb-4">Encrypted Data Vault</h3>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} shadow-sm" role="alert">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="card mb-5 bg-light border-0">
+                    <div class="card-body p-4">
+                        <h6 class="text-uppercase text-muted fw-bold mb-3">Manual Snapshot Upload</h6>
+                        <form method="POST" enctype="multipart/form-data" class="row g-3 align-items-center">
+                            <div class="col-md-8">
+                                <input type="file" name="backup_file" class="form-control" required />
+                                <small class="text-muted mt-1 d-block">Files will be AES-256 encrypted upon ingestion.</small>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary w-100 py-2">Secure Upload</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mb-5">
+                    <div class="card-body p-4">
+                        <h5 class="card-header-custom">Active Database Snapshots</h5>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Ref ID</th>
+                                        <th>Snapshot Filename</th>
+                                        <th>Sync Date (UTC)</th>
+                                        <th>Size</th>
+                                        <th>Administrative Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for backup in backups %}
+                                        <tr>
+                                            <td class="text-muted font-monospace small">#{{ backup.id }}</td>
+                                            <td class="fw-medium">{{ backup.filename }}</td>
+                                            <td>{{ backup.upload_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                            <td class="font-monospace text-muted">{{ backup.file_size }}</td>
+                                            <td>
+                                                <form method="POST" action="{{ url_for('backup.delete_backup', backup_id=backup.id) }}" class="d-inline">
+                                                    <button type="submit" class="btn btn-sm btn-outline-warning text-dark border-secondary">Move to Cold Storage</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-4">Vault is currently empty.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body p-4 bg-white">
+                        <h5 class="card-header-custom text-secondary">Cold Storage (Archived Ledgers)</h5>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Ref ID</th>
+                                        <th>Archive Filename</th>
+                                        <th>Original Sync</th>
+                                        <th>Size</th>
+                                        <th>Restoration Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for backup in archived_backups %}
+                                        <tr>
+                                            <td class="text-muted font-monospace small">#{{ backup.id }}</td>
+                                            <td class="text-secondary">{{ backup.filename.replace('archived/', '') }}</td>
+                                            <td class="text-secondary">{{ backup.upload_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                            <td class="font-monospace text-muted">{{ backup.file_size }}</td>
+                                            <td>
+                                                <form method="POST" action="{{ url_for('backup.restore_backup', backup_id=backup.id) }}" class="d-inline">
+                                                    <button type="submit" class="btn btn-sm btn-success text-white">Promote to Active</button>
+                                                </form>
+                                                <form method="POST" action="{{ url_for('backup.purge_backup', backup_id=backup.id) }}" class="d-inline">
+                                                    <button type="submit" class="btn btn-sm btn-danger ms-1">Eradicate</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-4">No data in cold storage.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Global Command | FinGuard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+            <aside class="col-md-3 col-lg-2 sidebar p-4">
+                <h5 class="mb-4">FinGuard <br><span class="fs-6 fw-normal text-muted">Financial DR</span></h5>
+                <nav class="nav flex-column gap-2">
+                    <a class="nav-link active" href="{{ url_for('dashboard.home') }}">Global Status</a>
+                    <a class="nav-link" href="{{ url_for('backup.manage_backups') }}">Secure Vault</a>
+                    <a class="nav-link" href="{{ url_for('recovery.recovery_page') }}">Failover Protocol</a>
+                    <div class="mt-4 pt-3 border-top" style="border-color: rgba(255,255,255,0.1) !important;">
+                        <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">Terminate Session</a>
+                    </div>
+                </nav>
+            </aside>
+
+            <main class="col-md-9 col-lg-10 p-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="mb-1">Core System Overview</h3>
+                        <p class="text-muted mb-0"><span class="status-indicator"></span>All primary banking systems operational.</p>
+                    </div>
+                    <div class="text-end">
+                        <span id="utc-clock" class="badge bg-light text-dark border p-2 font-monospace">Loading Time...</span>
+                        <span class="badge bg-success ms-2 p-2">PCI-DSS Compliant</span>
+                    </div>
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} shadow-sm" role="alert">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="row g-4 mb-5">
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted text-uppercase small fw-bold mb-3">Encrypted Snapshots</h6>
+                                <div class="metric-value">{{ total_backups }}</div>
+                                <p class="text-success small mt-2 mb-0">↑ Synchronized across regions</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted text-uppercase small fw-bold mb-3">Failover Events Logged</h6>
+                                <div class="metric-value">{{ total_recoveries }}</div>
+                                <p class="text-muted small mt-2 mb-0">Within 30-day reporting window</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-lg-4">
+                        <div class="card h-100" style="background: linear-gradient(135deg, var(--bank-primary) 0%, #1a365d 100%); color: white;">
+                            <div class="card-body">
+                                <h6 class="text-white-50 text-uppercase small fw-bold mb-3">System RTO Target</h6>
+                                <div class="metric-value text-white">&lt; 15 mins</div>
+                                <div class="progress mt-3" style="height: 6px; background-color: rgba(255,255,255,0.2);">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 98%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body p-4">
+                        <h5 class="card-header-custom">Recent Transaction Ledger Backups</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Ref ID</th>
+                                        <th>Ledger Filename</th>
+                                        <th>Timestamp (UTC)</th>
+                                        <th>Payload Size (bytes)</th>
+                                        <th>Integrity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for backup in recent_backups %}
+                                        <tr>
+                                            <td class="text-muted font-monospace small">#{{ backup.id }}</td>
+                                            <td class="fw-medium">{{ backup.filename }}</td>
+                                            <td>{{ backup.upload_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                            <td class="font-monospace text-muted">{{ backup.file_size }}</td>
+                                            <td><span class="badge bg-light text-success border border-success"><i class="bi bi-shield-check"></i> Verified</span></td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-4">No recent ledger data found in the active vault.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>

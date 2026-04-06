@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --bank-primary: #0A2540;
+    --bank-secondary: #00E6A4; /* A trusted, operational green */
+    --bank-bg: #F6F9FC;
+    --bank-text: #32325D;
+    --bank-sidebar: #041428;
+    --bank-border: #E6EBF1;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bank-bg);
+    color: var(--bank-text);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    background-color: var(--bank-sidebar);
+    color: #ffffff;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.sidebar h5 {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #fff;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 1rem;
+}
+
+.sidebar .nav-link {
+    color: #8898AA;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid var(--bank-secondary);
+}
+
+.sidebar .text-danger {
+    color: #FF6B6B !important;
+}
+
+/* Cards & Layout */
+.card {
+    border: 1px solid var(--bank-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+    background-color: #ffffff;
+}
+
+.card-header-custom {
+    border-bottom: 1px solid var(--bank-border);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    font-weight: 600;
+    color: var(--bank-primary);
+}
+
+/* Typography & Tables */
+h2, h3, h4, h5 {
+    color: var(--bank-primary);
+    font-weight: 600;
+}
+
+.metric-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--bank-primary);
+}
+
+.table th {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    color: #8898AA;
+    border-bottom: 2px solid var(--bank-border);
+}
+
+.table td {
+    vertical-align: middle;
+    color: var(--bank-text);
+    font-size: 0.9rem;
+}
+
+/* Authentication Pages */
+.login-card {
+    width: 100%;
+    max-width: 450px;
+    border-radius: 12px;
+}
+
+.btn-primary {
+    background-color: var(--bank-primary);
+    border-color: var(--bank-primary);
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.btn-primary:hover {
+    background-color: #051626;
+    border-color: #051626;
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    background-color: var(--bank-secondary);
+}
