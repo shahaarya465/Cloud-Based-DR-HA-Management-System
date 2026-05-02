@@ -3,8 +3,7 @@
 A simple web application that demonstrates disaster recovery workflows and high availability concepts.
 
 This project helps show how a system can reduce downtime and data loss during failures.
-
-**🚀 Live Demo:** [http://15.206.172.53:5000/auth/login](http://15.206.172.53:5000/auth/login) *(Currently hosted on an AWS EC2 instance)*
+https://github.com/shahaarya465/Cloud-Based-DR-HA-Management-System/blob/main/README.md
 
 ## 1. Project Objective
 
